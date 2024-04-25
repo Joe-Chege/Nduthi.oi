@@ -37,71 +37,10 @@ def ussd_callback():
     elif text == '1*1*1':
         # Calculate distance when engine capacity is 100cc and average speed is 20 km/hr
         distance = calculate_distance(100, 20)
-        response = "END Estimated distance on full tank: {:.2f} km".format(distance)
-    
-    elif text == '1*1*2':
-        # Calculate distance when engine capacity is 100cc and average speed is 30 km/hr
-        distance = calculate_distance(100, 30)
-        response = "END Estimated distance on full tank: {:.2f} km".format(distance)
-    elif text == '1*1*3':
-        # Calculate distance when engine capacity is 100cc and average speed is 40 km/hr
-        distance = calculate_distance(100, 40)
-        response = "END Estimated distance on full tank: {:.2f} km".format(distance)
-    elif text == '1*2':
-        # Display options for average travel speed
-        response = "CON Select your average travel speed (km/hr):\n"
-        response += "1. 20 km/hr\n"
-        response += "2. 30 km/hr\n"
-        response += "3. 40 km/hr"
-    elif text == '1*2*1':
-        # Calculate distance when engine capacity is 125cc and average speed is 20 km/hr
-        distance = calculate_distance(125, 20)
-        response = "END Estimated distance on full tank: {:.2f} km".format(distance)
-    elif text == '1*2*2':
-        # Calculate distance when engine capacity is 125cc and average speed is 30 km/hr
-        distance = calculate_distance(125, 30)
-        response = "END Estimated distance on full tank: {:.2f} km".format(distance)
-    elif text == '1*2*3':
-        # Calculate distance when engine capacity is 125cc and average speed is 40 km/hr
-        distance = calculate_distance(125, 40)
-        response = "END Estimated distance on full tank: {:.2f} km".format(distance)
-    elif text == '1*3':
-        # Display options for average travel speed
-        response = "CON Select your average travel speed (km/hr):\n"
-        response += "1. 20 km/hr\n"
-        response += "2. 30 km/hr\n"
-        response += "3. 40 km/hr"
-    elif text == '1*3*1':
-        # Calculate distance when engine capacity is 150cc and average speed is 20 km/hr
-        distance = calculate_distance(150, 20)
-        response = "END Estimated distance on full tank: {:.2f} km".format(distance)
-    elif text == '1*3*2':
-        # Calculate distance when engine capacity is 150cc and average speed is 30 km/hr
-        distance = calculate_distance(150, 30)
-        response = "END Estimated distance on full tank: {:.2f} km".format(distance)
-    elif text == '1*3*3':
-        # Calculate distance when engine capacity is 150cc and average speed is 40 km/hr
-        distance = calculate_distance(150, 40)
-        response = "END Estimated distance on full tank: {:.2f} km".format(distance)
-    elif text == '1*4':
-        # Display options for average travel speed
-        response = "CON Select your average travel speed (km/hr):\n"
-        response += "1. 20 km/hr\n"
-        response += "2. 30 km/hr\n"
-        response += "3. 40 km/hr"
-    elif text == '1*4*1':
-        # Calculate distance when engine capacity is 200cc and average speed is 20 km/hr
-        distance = calculate_distance(200, 20)
-        response = "END Estimated distance on full tank: {:.2f} km".format(distance)
-    elif text == '1*4*2':
-        # Calculate distance when engine capacity is 200cc and average speed is 30 km/hr
-        distance = calculate_distance(200, 30)
-        response = "END Estimated distance on full tank: {:.2f} km".format(distance)
-    elif text == '1*4*3':
-        # Calculate distance when engine capacity is 200cc and average speed is 40 km/hr
-        distance = calculate_distance(200, 40)
-        response = "END Estimated distance on full tank: {:.2f} km".format(distance)
-    
+        fuel_cost = calculate_cost(distance)
+        response = "END Estimated distance on full tank: {:.2f} km\n".format(distance)
+        response += "Estimated fuel cost: KES {:.2f}".format(fuel_cost)
+
     elif text == '2':
         response = "CON More Information (Coming Soon)"
 
@@ -134,6 +73,13 @@ def calculate_distance(engine_capacity, average_speed):
     # Calculate distance covered at the selected average speed
     distance = distance * (average_speed / 60)  # Convert average speed from km/hr to km/min
     return distance
+
+def calculate_cost(distance):
+    # Fuel price per liter (replace with logic to fetch real-time price)
+    fuel_price_per_liter = 193  # Kenyan shillings
+    # Calculate estimated fuel cost for the trip
+    fuel_cost = distance * fuel_price_per_liter / 100
+    return fuel_cost
 
 if __name__ == "__main__":
     app.run(debug=True)
