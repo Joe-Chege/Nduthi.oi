@@ -1,12 +1,22 @@
 import os
 from flask import Flask, request
 
+
 app = Flask(__name__)
 
 # Motorcycle engine capacity data (replace with actual data source)
 motorcycle_data = {
-    150: {  # Engine capacity in cc
-        "average_fuel_efficiency": 50  # kilometers per liter
+    100: {  # Engine capacity in cc
+        "average_fuel_efficiency": 40  # kilometers per liter
+    },
+    125: {
+        "average_fuel_efficiency": 45
+    },
+    150: {
+        "average_fuel_efficiency": 50
+    },
+    200: {
+        "average_fuel_efficiency": 55
     }
 }
 
@@ -47,34 +57,54 @@ def ussd_callback():
     elif text == '1':
         # Request engine capacity if not already provided
         if "engine_capacity" not in user_data:
-            response = "CON Enter your motorcycle engine capacity (cc): "
+            response = "CON Select your motorcycle engine capacity:\n"
+            response += "1. 100cc\n"
+            response += "2. 125cc\n"
+            response += "3. 150cc\n"
+            response += "4. 200cc\n"
+        elif "average_speed" not in user_data:
+            # Request average speed if engine capacity is already provided
+            response = "CON Select your average travel speed (km/hr):\n"
+            response += "1. 20 km/hr\n"
+            response += "2. 30 km/hr\n"
+            response += "3. 40 km/hr\n"
         else:
-            # Calculate and display estimated distance
-            distance = calculate_distance(user_data["engine_capacity"], 40)  # Assuming average speed of 40 km/hr for now
-            response = "END Estimated distance on full tank: " + str(distance) + " km"
+            # Calculate and display estimated distance and fuel cost
+            distance = calculate_distance(user_data["engine_capacity"], user_data["average_speed"])
+            fuel_cost = calculate_cost(distance)
+            response = "END Estimated distance on full tank: {} km\n".format(distance)
+            response += "Estimated fuel cost: KES {:.2f}".format(fuel_cost)
 
-    elif text.isdigit() and "engine_capacity" not in user_data:  # User enters engine capacity
-        # Validate input (check if it's a number)
-        try:
-            engine_capacity = int(text)
+    elif text.isdigit() and "engine_capacity" not in user_data:
+        # Store engine capacity entered by user
+        engine_capacity = int(text)
+        if engine_capacity not in motorcycle_data:
+            response = "ERR Invalid engine capacity"
+        else:
             user_data["engine_capacity"] = engine_capacity
-            response = "CON Enter your average travel speed (km/hr): "
+            response = "CON Select your average travel speed (km/hr):\n"
+            response += "1. 20 km/hr\n"
+            response += "2. 30 km/hr\n"
+            response += "3. 40 km/hr"
             user_session_data[session_id] = user_data  # Update session data
-        except ValueError:
-            response = "ERR Invalid engine capacity. Please enter a number."
 
-    elif text.isdigit() and "engine_capacity" in user_data:  # User enters average speed
-        # Calculate and display results
+    elif text.isdigit() and "engine_capacity" in user_data and "average_speed" not in user_data:
+        # Store average speed entered by user
         average_speed = int(text)
-        distance = calculate_distance(user_data["engine_capacity"], average_speed)
-        fuel_cost = calculate_cost(distance)
-        response = "END Estimated distance: " + str(distance) + " km\n"
-        response += "Estimated fuel cost: KES " + str(f"{fuel_cost:.2f}")  # Format fuel cost to two decimal places
+        if average_speed not in [20, 30, 40]:
+            response = "ERR Invalid average speed"
+        else:
+            user_data["average_speed"] = average_speed
+            # Calculate and display estimated distance and fuel cost
+            distance = calculate_distance(user_data["engine_capacity"], user_data["average_speed"])
+            fuel_cost = calculate_cost(distance)
+            response = "END Estimated distance on full tank: {} km\n".format(distance)
+            response += "Estimated fuel cost: KES {:.2f}".format(fuel_cost)
+
+    elif text == '2':
+        response = "CON More Information (Coming Soon)"
 
     else:
         response = "ERR Invalid Input"
 
     return response
-
-if __name__ == '__main__':
-    app.run()
